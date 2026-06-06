@@ -16,7 +16,7 @@ export default function DashboardPage() {
 
   const fetchTasks = async () => {
     const res = await api.get("/tasks");
-    setTasks(res.data.data);
+    setTasks(res.data); // ✅ FIX: tidak pakai .data.data
   };
 
   useEffect(() => {
@@ -38,7 +38,11 @@ export default function DashboardPage() {
     fetchTasks();
   };
 
-  const columns = ["TODO", "IN_PROGRESS", "DONE"];
+  const columns: ("TODO" | "IN_PROGRESS" | "DONE")[] = [
+    "TODO",
+    "IN_PROGRESS",
+    "DONE",
+  ];
 
   return (
     <div className="p-6">
@@ -56,7 +60,7 @@ export default function DashboardPage() {
               key={col}
               id={col}
               title={col}
-              tasks={tasks.filter((t) => t.status === col)}
+              tasks={tasks[col] ?? []} // ✅ FIX UTAMA
             />
           ))}
         </div>
