@@ -8,9 +8,9 @@ import {
   DndContext,
   closestCenter,
   DragEndEvent,
-  useDroppable,
-  useDraggable,
 } from "@dnd-kit/core";
+
+import Column from "../../components/Column";
 
 const columns = ["TODO", "IN_PROGRESS", "DONE"] as const;
 
@@ -31,49 +31,41 @@ export default function DashboardPage() {
 
     if (!over) return;
 
-    const taskId = active.id as string;
-    const newStatus = over.id as string;
+    const taskId = active.id;
+    const newStatus = over.id;
 
-    // 🔥 OPTIMISTIC UPDATE (BIAR SMOOTH)
     const updated = { ...tasks };
 
     for (const col of columns) {
       updated[col] = updated[col].filter((t) => t.id !== taskId);
     }
 
-    const movedTask = Object.values(tasks)
+    const moved = Object.values(tasks)
       .flat()
       .find((t) => t.id === taskId);
 
-    if (movedTask) {
-      movedTask.status = newStatus;
-      updated[newStatus].push(movedTask);
+    if (moved) {
+      moved.status = newStatus;
+      updated[newStatus].push(moved);
     }
 
     setTasks(updated);
 
-    // 🔥 BACKEND UPDATE
     await api.patch(`/tasks/${taskId}/status`, {
       status: newStatus,
     });
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">
-        Task Board
-      </h1>
-
-      <DndContext
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="grid grid-cols-3 gap-4">
-          {columns.map((col) => (
-            <Column key={col} id={col} tasks={tasks[col] || []} />
-          ))}
-        </div>
-      </DndContext>
-    </div>
+    <DndContext
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="grid grid-cols-3 gap-4 p-6">
+        {columns.map((col) => (
+          <Column key={col} id={col} tasks={tasks[col] || []} />
+        ))}
+      </div>
+    </DndContext>
   );
 }
