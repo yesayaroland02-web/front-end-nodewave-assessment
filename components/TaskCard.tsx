@@ -1,48 +1,22 @@
-"use client";
-
 import { useDraggable } from "@dnd-kit/core";
-import type { Task } from "../types/task";
 
-export default function TaskCard({ task }: { task: Task }) {
-  const isBlocked =
-    task.dependencies?.some(
-      (dep) => dep.dependsOn.status !== "DONE"
-    ) ?? false;
-
+export default function TaskCard({ task }) {
   const { attributes, listeners, setNodeRef, transform } =
-    useDraggable({
-      id: task.id,
-      disabled: isBlocked, // 🔥 LOCK DRAG
-    });
-
-  const style = transform
-    ? {
-        transform: `translate(${transform.x}px, ${transform.y}px)`,
-      }
-    : undefined;
+    useDraggable({ id: task.id });
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
       {...listeners}
       {...attributes}
-      className={`p-3 rounded shadow mb-3 cursor-grab transition ${
-        isBlocked
-          ? "bg-red-100 opacity-60 cursor-not-allowed"
-          : "bg-white"
-      }`}
+      style={{
+        transform: transform
+          ? `translate(${transform.x}px, ${transform.y}px)`
+          : undefined,
+      }}
+      className="p-2 bg-white rounded shadow mb-2 cursor-grab active:cursor-grabbing"
     >
-      <h3 className="font-semibold">{task.title}</h3>
-      <p className="text-sm text-gray-600">
-        {task.description}
-      </p>
-
-      {isBlocked && (
-        <p className="text-xs text-red-600 mt-2">
-          🔒 Blocked by dependency
-        </p>
-      )}
+      {task.title}
     </div>
   );
 }
