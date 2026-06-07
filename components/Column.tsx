@@ -1,26 +1,14 @@
-import { Task } from "../store/task.store";
+import { useDroppable } from "@dnd-kit/core";
 
-export default function Column({
-  id,
-  title,
-  tasks,
-}: {
-  id: string;
-  title: string;
-  tasks: Task[];
-}) {
+export default function Column({ id, tasks }) {
+  const { setNodeRef } = useDroppable({ id });
+
   return (
-    <div className="bg-gray-100 p-4 rounded min-h-[200px]">
-      <h2 className="font-bold mb-2">{title}</h2>
+    <div ref={setNodeRef} className="bg-gray-100 p-4 rounded min-h-[400px]">
+      <h2 className="font-bold mb-3">{id}</h2>
 
-      {tasks?.map((task) => (
-        <div
-          key={task.id}
-          className="p-2 bg-white rounded mb-2 shadow"
-          draggable
-        >
-          {task.title}
-        </div>
+      {tasks.map((task) => (
+        <TaskCard key={task.id} task={task} />
       ))}
     </div>
   );
